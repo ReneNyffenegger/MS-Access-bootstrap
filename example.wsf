@@ -14,7 +14,7 @@
       option explicit
 
       dim projectRootDir
-          projectRootDir = "C:\Users\r.nyffenegger\Zurich Insurance\ZGEBS IT meets Business - Documents\Dev-Aggr-Output-4-Storm\"
+          projectRootDir = "p:\ath\to\project\root\"
 
       call createDB(projectRootDir & "db.accdb")
 
