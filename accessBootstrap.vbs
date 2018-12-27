@@ -1,12 +1,14 @@
 '
-' cscript accessBootstrap.vbs \path\to\accessFileToCreate.accdb \path\to\init.bas 
+' cscript accessBootstrap.vbs \path\to\accessFileToCreate.accdb \path\of\00_ModuleLoader.bas \path\to\initModule.bas
 '
 ' Creates the access file specified with the first parameter (after
 ' deleting it if it exists)
 '
-' Then loads the module specified with the second parameter into the
-' created access files, names it "_init" and runs the sub init
-' that must exist in that module.
+' Then loads the module 00_ModuleLoader.bas (See https://renenyffenegger.ch/notes/development/languages/VBA/modules/Common/00_ModuleLoader) whose
+' directory is specified with the second parameter.
+' created access files,
+'
+' Then loads the initModule.bas module which must contain a createApp sub.
 '
 
 
@@ -17,27 +19,36 @@ dim acc       ' as access.application
 dim fso
   
 dim vb_editor ' as vbe
-dim mdl       ' as VBComponent
+
 
 dim vb_proj   ' as VBProject
 dim vb_comps  ' as VBComponents
 
 dim args
-dim scriptFile
+' dim scriptFile
+
+dim initFunc
+initFunc = "createApp"
 
 set args = wscript.arguments
 
-if args.count < 2 then
-   wscript.echo "required: access file name and script file name"
+if args.count < 3 then
+   wscript.echo args.count & " were given, but at least 3 are required:"
+   wscript.echo "  Name of access db to be created"
+   wscript.echo "  Path (without filename) to 00_ModuleLoader.bas"
+   wscript.echo "  Path (with filename) to module that creates the app."
    wscript.quit
 end if
   
 accessFile = args(0)
-scriptFile = args(1)
+
+
+' wscript.echo "accessFile = " & accessFile
   
 set fso = createObject("Scripting.FileSystemObject")
 
 if fso.fileExists(accessFile) then
+   wscript.echo accessFile & " already exists. Deleting it."
    fso.deleteFile(accessFile)
 end if
   
@@ -51,16 +62,37 @@ acc.userControl = true ' http://stackoverflow.com/q/36282024/180275
 
 set vb_editor = acc.vbe
 set vb_proj   = vb_editor.activeVBProject
-set vb_comps  = vb_proj.VBComponents
+set vb_comps  = vb_proj.vbComponents
+
+'
+'    Add reference to "Microsoft Visual Basic for Applicatinos Extensibility 5.3"
+'
+call acc.VBE.activevbProject.references.addFromGuid ("{0002E157-0000-0000-C000-000000000046}", 5, 3)
+
+
+
+call insertModule(args(1) & "\00_ModuleLoader.bas", "00_ModuleLoader")
+call insertModule(args(2)                         , "createAppModule")
     
-  
-set mdl = vb_comps.Add(1) ' 1 = vbext_ct_StdModule
+wscript.echo "Calling " & initFunc  
+acc.run(initFunc)
+
+
+sub insertModule(moduleFilePath, moduleName) ' {
+
+    if not fso.fileExists(moduleFilePath) then ' {
+       wscript.echo moduleFilePath & " does not exist!"
+       wscript.quit
+    end if ' }
+
+    dim mdl ' as VBComponent
+    set mdl = vb_comps.add(1) ' 1 = vbext_ct_StdModule
    
-wscript.echo("adding scriptFile " & scriptFile)
-mdl.codeModule.addFromFile (scriptFile)
+    wscript.echo("adding scriptFile " & ModuleFilePath)
+    mdl.codeModule.addFromFile (ModuleFilePath)
    
-mdl.name = "_init"
+    mdl.name = moduleName
    
-acc.doCmd.close 5, "_init", 1 ' 5=acModule, 1=acSaveYes
-  
-acc.run("init")
+    acc.doCmd.close 5, mdl.name, 1 ' 5=acModule, 1=acSaveYes
+
+end sub ' }
