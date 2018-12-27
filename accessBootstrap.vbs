@@ -1,3 +1,4 @@
+' OLD DOCUMENTATION, please remove me!!!!
 '
 ' cscript accessBootstrap.vbs \path\to\accessFileToCreate.accdb \path\of\00_ModuleLoader.bas \path\to\initModule.bas
 '
@@ -16,69 +17,76 @@ option explicit
 
 dim accessFile
 dim acc       ' as access.application
+
 dim fso
+set fso = createObject("Scripting.FileSystemObject")
   
 dim vb_editor ' as vbe
-
 
 dim vb_proj   ' as VBProject
 dim vb_comps  ' as VBComponents
 
-dim args
+' dim args
 ' dim scriptFile
 
-dim initFunc
-initFunc = "createApp"
+' dim initFunc
+' initFunc = "createApp"
 
-set args = wscript.arguments
+' set args = wscript.arguments
 
-if args.count < 3 then
-   wscript.echo args.count & " were given, but at least 3 are required:"
-   wscript.echo "  Name of access db to be created"
-   wscript.echo "  Path (without filename) to 00_ModuleLoader.bas"
-   wscript.echo "  Path (with filename) to module that creates the app."
-   wscript.quit
-end if
+' if args.count < 3 then
+'   wscript.echo args.count & " were given, but at least 3 are required:"
+'   wscript.echo "  Name of access db to be created"
+'   wscript.echo "  Path (without filename) to 00_ModuleLoader.bas"
+'   wscript.echo "  Path (with filename) to module that creates the app."
+'   wscript.quit
+'end if
   
-accessFile = args(0)
+'accessFile = args(0)
 
 
 ' wscript.echo "accessFile = " & accessFile
-  
-set fso = createObject("Scripting.FileSystemObject")
-
-if fso.fileExists(accessFile) then
-   wscript.echo accessFile & " already exists. Deleting it."
-   fso.deleteFile(accessFile)
-end if
-  
-  
-set acc = createObject("Access.Application")
-  
-acc.newCurrentDatabase accessFile, 0 ' 0: acNewDatabaseFormatUserDefault
-
-acc.visible     = true
-acc.userControl = true ' http://stackoverflow.com/q/36282024/180275
-
-set vb_editor = acc.vbe
-set vb_proj   = vb_editor.activeVBProject
-set vb_comps  = vb_proj.vbComponents
-
-'
-'    Add reference to "Microsoft Visual Basic for Applicatinos Extensibility 5.3"
-'
-call acc.VBE.activevbProject.references.addFromGuid ("{0002E157-0000-0000-C000-000000000046}", 5, 3)
 
 
-
-call insertModule(args(1) & "\00_ModuleLoader.bas", "00_ModuleLoader")
-call insertModule(args(2)                         , "createAppModule")
+' call insertModule(args(1) & "\00_ModuleLoader.bas", "00_ModuleLoader")
+' call insertModule(args(2)                         , "createAppModule")
     
-wscript.echo "Calling " & initFunc  
-acc.run(initFunc)
+' wscript.echo "Calling " & initFunc  
+' acc.run(initFunc)
+
+sub createDB(accessFile) ' {
 
 
-sub insertModule(moduleFilePath, moduleName) ' {
+    if fso.fileExists(accessFile) then
+       wscript.echo accessFile & " already exists. Deleting it."
+       fso.deleteFile(accessFile)
+    end if
+  
+  
+    set acc = createObject("Access.Application")
+    acc.newCurrentDatabase accessFile, 0 ' 0: acNewDatabaseFormatUserDefault
+
+    acc.visible     = true
+    acc.userControl = true ' http://stackoverflow.com/q/36282024/180275
+
+    set vb_editor = acc.vbe
+    set vb_proj   = vb_editor.activeVBProject
+    set vb_comps  = vb_proj.vbComponents
+
+    '
+    '    Add reference to "Microsoft Visual Basic for Applications Extensibility 5.3"
+    '
+    call addReference("{0002E157-0000-0000-C000-000000000046}", 5, 3)
+
+
+end sub ' }
+
+sub insertModule(moduleFilePath, moduleName, moduleType) ' {
+ '
+ '  moduleType:
+ '    1 = vbext_ct_StdModule
+ '    2 = vbext_ct_ClassModule
+ '    
 
     if not fso.fileExists(moduleFilePath) then ' {
        wscript.echo moduleFilePath & " does not exist!"
@@ -95,4 +103,11 @@ sub insertModule(moduleFilePath, moduleName) ' {
    
     acc.doCmd.close 5, mdl.name, 1 ' 5=acModule, 1=acSaveYes
 
+end sub ' }
+
+sub addReference(guid, major, minor) ' {
+  '
+  ' Note: guid probably needs the opening and closing curly paranthesis.
+  '
+    call acc.VBE.activeVbProject.references.addFromGuid (guid, major, minor)
 end sub ' }

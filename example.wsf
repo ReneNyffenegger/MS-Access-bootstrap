@@ -1,0 +1,45 @@
+<!--
+
+   Create access application from commandline with VBScript:
+
+       c:\> cscript example.wsf
+
+-->
+<job id="IsThisIdRequired">
+
+   <script language="VBScript" src="VBA/accessBootstrap.vbs" />
+
+   <script language="VBScript">
+
+      option explicit
+
+      dim projectRootDir
+          projectRootDir = "C:\Users\r.nyffenegger\Zurich Insurance\ZGEBS IT meets Business - Documents\Dev-Aggr-Output-4-Storm\"
+
+      call createDB(projectRootDir & "db.accdb")
+
+    '
+    ' Add References to
+    '      MSXML2
+    '      Microsoft Scripting Runtime
+    '      Microsoft VBScript REgular Expressions 5.5
+    '
+      call addReference("{F5078F18-C551-11D3-89B9-0000F81FE221}", 6, 0)
+      call addReference("{420B2830-E718-11CF-893D-00A0C9054228}", 1, 0)
+      call addReference("{3F4DACA7-160D-11D2-A8E9-00104B365C9F}", 5, 5)
+
+      call insertModule(projectRootDir & "VBA\modules\Common\00_ModuleLoader.bas", "00_ModuleLoader", 1)
+      call insertModule(projectRootDir & "VBA\init.txt"                          , "init"           , 1)
+
+      acc.run("LoadModules")
+
+    '
+    ' Create the schema of the application.
+    ' 
+      call acc.run("runSQLScript", projectRootDir & "SQLs\schema.sql")
+
+      wscript.echo("The end")
+
+   </script>
+
+</job>
