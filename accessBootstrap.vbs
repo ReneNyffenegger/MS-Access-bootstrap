@@ -1,17 +1,9 @@
-' OLD DOCUMENTATION, please remove me!!!!
 '
-' cscript accessBootstrap.vbs \path\to\accessFileToCreate.accdb \path\of\00_ModuleLoader.bas \path\to\initModule.bas
+' Provide the functionality to create Access applications from
+' the command line.
 '
-' Creates the access file specified with the first parameter (after
-' deleting it if it exists)
+' The functions in this file should be called from a *.wsf file.
 '
-' Then loads the module 00_ModuleLoader.bas (See https://renenyffenegger.ch/notes/development/languages/VBA/modules/Common/00_ModuleLoader) whose
-' directory is specified with the second parameter.
-' created access files,
-'
-' Then loads the initModule.bas module which must contain a createApp sub.
-'
-
 
 option explicit
 
@@ -25,34 +17,6 @@ dim vb_editor ' as vbe
 
 dim vb_proj   ' as VBProject
 dim vb_comps  ' as VBComponents
-
-' dim args
-' dim scriptFile
-
-' dim initFunc
-' initFunc = "createApp"
-
-' set args = wscript.arguments
-
-' if args.count < 3 then
-'   wscript.echo args.count & " were given, but at least 3 are required:"
-'   wscript.echo "  Name of access db to be created"
-'   wscript.echo "  Path (without filename) to 00_ModuleLoader.bas"
-'   wscript.echo "  Path (with filename) to module that creates the app."
-'   wscript.quit
-'end if
-  
-'accessFile = args(0)
-
-
-' wscript.echo "accessFile = " & accessFile
-
-
-' call insertModule(args(1) & "\00_ModuleLoader.bas", "00_ModuleLoader")
-' call insertModule(args(2)                         , "createAppModule")
-    
-' wscript.echo "Calling " & initFunc  
-' acc.run(initFunc)
 
 sub createDB(accessFile) ' {
 
@@ -73,9 +37,9 @@ sub createDB(accessFile) ' {
     set vb_proj   = vb_editor.activeVBProject
     set vb_comps  = vb_proj.vbComponents
 
-    '
-    '    Add reference to "Microsoft Visual Basic for Applications Extensibility 5.3"
-    '
+  '
+  ' Add (type lib) reference to "Microsoft Visual Basic for Applications Extensibility 5.3"
+  '
     call addReference("{0002E157-0000-0000-C000-000000000046}", 5, 3)
 
 
@@ -86,6 +50,8 @@ sub insertModule(moduleFilePath, moduleName, moduleType) ' {
  '  moduleType:
  '    1 = vbext_ct_StdModule
  '    2 = vbext_ct_ClassModule
+ '
+ '  Compare with https://renenyffenegger.ch/notes/development/languages/VBA/modules/Common/00_ModuleLoader
  '    
 
     if not fso.fileExists(moduleFilePath) then ' {
@@ -106,6 +72,9 @@ sub insertModule(moduleFilePath, moduleName, moduleType) ' {
 end sub ' }
 
 sub addReference(guid, major, minor) ' {
+  '
+  ' guid identfies a type lib. Thus, the guid should be found in the
+  ' Registry under HKEY_CLASSES_ROOT\TypeLib\
   '
   ' Note: guid probably needs the opening and closing curly paranthesis.
   '
