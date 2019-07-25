@@ -7,8 +7,9 @@
 
 option explicit
 
-dim accessFile
-dim acc       ' as access.application
+' dim accessFile
+dim app       ' as access.application
+dim xls
 
 dim fso
 set fso = createObject("Scripting.FileSystemObject")
@@ -20,20 +21,57 @@ dim vb_comps  ' as VBComponents
 
 sub createDB(accessFile) ' {
 
+    createOfficeApp "access", accessFile
 
-    if fso.fileExists(accessFile) then
-       wscript.echo accessFile & " already exists. Deleting it."
-       fso.deleteFile(accessFile)
+'   if fso.fileExists(accessFile) then
+'      wscript.echo accessFile & " already exists. Deleting it."
+'      fso.deleteFile(accessFile)
+'   end if
+' 
+' 
+'   set acc = createObject("Access.Application")
+'   acc.newCurrentDatabase accessFile, 0 ' 0: acNewDatabaseFormatUserDefault
+
+'   acc.visible     = true
+'   acc.userControl = true ' http://stackoverflow.com/q/36282024/180275
+
+'   set vb_editor = acc.vbe
+'   set vb_proj   = vb_editor.activeVBProject
+'   set vb_comps  = vb_proj.vbComponents
+
+' '
+' ' Add (type lib) reference to "Microsoft Visual Basic for Applications Extensibility 5.3"
+' '
+'   call addReference("{0002E157-0000-0000-C000-000000000046}", 5, 3)
+
+end sub ' }
+
+sub createOfficeApp(officeName, fileName) ' {
+
+    if fso.fileExists(fileName) then
+       wscript.echo fileName & " already exists. Deleting it."
+       fso.deleteFile(fileName)
     end if
   
   
-    set acc = createObject("Access.Application")
-    acc.newCurrentDatabase accessFile, 0 ' 0: acNewDatabaseFormatUserDefault
+    if     officeName = "access" then
 
-    acc.visible     = true
-    acc.userControl = true ' http://stackoverflow.com/q/36282024/180275
+           set app = createObject("access.application")
+           app.newCurrentDatabase fileName, 0 ' 0: acNewDatabaseFormatUserDefault
 
-    set vb_editor = acc.vbe
+    elseIf officeName = "excel"  then
+
+           set app = createObject("excel.application")
+           set xls = app.workBooks.add
+           xls.saveAs fileName, 52 ' 52 = xlOpenXMLWorkbookMacroEnabled
+
+    end if
+
+
+    app.visible     = true
+    app.userControl = true ' https://stackoverflow.com/q/36282024/180275
+
+    set vb_editor = app.vbe
     set vb_proj   = vb_editor.activeVBProject
     set vb_comps  = vb_proj.vbComponents
 
@@ -42,8 +80,8 @@ sub createDB(accessFile) ' {
   '
     call addReference("{0002E157-0000-0000-C000-000000000046}", 5, 3)
 
-
 end sub ' }
+
 
 sub insertModule(moduleFilePath, moduleName, moduleType) ' {
  '
@@ -67,7 +105,10 @@ sub insertModule(moduleFilePath, moduleName, moduleType) ' {
    
     mdl.name = moduleName
    
-    acc.doCmd.close 5, mdl.name, 1 ' 5=acModule, 1=acSaveYes
+    if app.name = "MicrosoftAccess" then
+       app.doCmd.close 5, mdl.name, 1 ' 5=acModule, 1=acSaveYes
+    end if
+
 
 end sub ' }
 
@@ -78,5 +119,5 @@ sub addReference(guid, major, minor) ' {
   '
   ' Note: guid probably needs the opening and closing curly paranthesis.
   '
-    call acc.VBE.activeVbProject.references.addFromGuid (guid, major, minor)
+    call app.VBE.activeVbProject.references.addFromGuid (guid, major, minor)
 end sub ' }
