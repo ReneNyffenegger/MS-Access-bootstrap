@@ -37,13 +37,18 @@
     '
     ' A possible sensible choice of modules to be added to the Access project might be:
     '
-    ' call insertModule(projectRootDir & "VBAModules\Common\file\File.bas"            , "File"                 , 1)
-    ' call insertModule(projectRootDir & "VBAModules\Database\SQL.bas"                , "SQL"                  , 1)
-    ' call insertModule(projectRootDir & "VBAModules\Access\CommonFunctionalityDB.bas", "CommonFunctionalityDB", 1)
+    '   call insertModule(projectRootDir & "VBAModules\Common\file\File.bas"            , "File"                 , 1)
+    '   call insertModule(projectRootDir & "VBAModules\Database\SQL.bas"                , "SQL"                  , 1)
+    '   call insertModule(projectRootDir & "VBAModules\Access\CommonFunctionalityDB.bas", "CommonFunctionalityDB", 1)
     '
     ' These modules are found at
     ' development/languages/VBA/modules/
     ' https://github.com/ReneNyffenegger/VBAModules
+    '
+    ' If these modules are used, two additional references need to be added as well:
+    '
+    '   call addReference("{B691E011-1797-432E-907A-4D8C69339129}", 6, 1) ' ADODB, needed for slurpFileCharSet in File.bas
+    '   call addReference("{3F4DACA7-160D-11D2-A8E9-00104B365C9F}", 5, 5) ' Regexp, needed for removeSQLComments in SQL.bas
     '
 
 
@@ -54,7 +59,6 @@
     '   (Error message: Microsoft VBScript compilation error: Cannot use parentheses when calling a Sub )
     '
       acc.run "createApplication", projectRootDir
-
 
       wscript.echo("The end")
 
