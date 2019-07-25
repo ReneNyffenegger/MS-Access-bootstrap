@@ -35,6 +35,19 @@
       call insertModule(projectRootDir & "init.bas", "init", 1)
 
     '
+    ' A possible sensible choice of modules to be added to the Access project might be:
+    '
+    ' call insertModule(projectRootDir & "VBAModules\Common\file\File.bas"            , "File"                 , 1)
+    ' call insertModule(projectRootDir & "VBAModules\Database\SQL.bas"                , "SQL"                  , 1)
+    ' call insertModule(projectRootDir & "VBAModules\Access\CommonFunctionalityDB.bas", "CommonFunctionalityDB", 1)
+    '
+    ' These modules are found at
+    ' development/languages/VBA/modules/
+    ' https://github.com/ReneNyffenegger/VBAModules
+    '
+
+
+    '
     ' Call a function/sub that is defined in the inserted init.bas:
     '
     ' If calling a function, the following run cannot use paranthesis
