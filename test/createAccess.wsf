@@ -35,9 +35,12 @@
       call insertModule(projectRootDir & "init.bas", "init", 1)
 
     '
-    ' Call a function that is defined in the inserted init.bas:
+    ' Call a function/sub that is defined in the inserted init.bas:
     '
-      acc.run("createApplication")
+    ' If calling a function, the following run cannot use paranthesis
+    '   (Error message: Microsoft VBScript compilation error: Cannot use parentheses when calling a Sub )
+    '
+      acc.run "createApplication", projectRootDir
 
 
       wscript.echo("The end")

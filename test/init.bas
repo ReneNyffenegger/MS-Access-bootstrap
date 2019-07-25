@@ -1,7 +1,7 @@
 option explicit
 
-sub createApplication() ' {
+sub createApplication(projectRootDir as string) ' {
 
-    msgBox "Now, the application should be created"
+    msgBox "createApplication, projectRootDir = " & projectRootDir
 
 end sub ' }
