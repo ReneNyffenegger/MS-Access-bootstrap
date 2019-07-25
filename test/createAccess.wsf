@@ -7,7 +7,7 @@
 -->
 <job id="IsThisIdRequired">
 
-   <script language="VBScript" src="../accessBootstrap.vbs" /> -- >
+   <script language="VBScript" src="../accessBootstrap.vbs" />
 
    <script language="VBScript">
 
@@ -24,7 +24,7 @@
       call createDB(projectRootDir & "created.accdb")
 
     '
-    ' Add (TypeLib) References to
+    ' Add (TypeLib) References
     '          '          '
       call addReference("{420B2830-E718-11CF-893D-00A0C9054228}", 1, 0) ' Microsoft Scripting Runtime
 
@@ -32,7 +32,7 @@
     ' Insert a module. The 3rd parameter (1) indicates a »normal« module (vbext_ct_StdModule)
     ' rather than a class module (vbext_ct_ClassModule)
     '
-      call insertModule(projectRootDir & "init.bas"                              , "init"           , 1)
+      call insertModule(projectRootDir & "init.bas", "init", 1)
 
     '
     ' Call a function that is defined in the inserted init.bas:
