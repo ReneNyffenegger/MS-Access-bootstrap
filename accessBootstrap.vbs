@@ -117,8 +117,23 @@ sub insertModule(app, moduleFilePath, moduleName, moduleType) ' {
   ' Check if a module by the given name already exists.
   ' If so, remove it
   '
-    if not vb_comps(moduleName) is nothing then
-       vb_comps.remove vb_comps(moduleName)
+  ' 
+  '
+
+  '
+  ' If no module with the name moduleName exists, by default
+  ' vb_comps(moduleName) throws a 'VBAProject: Subscript out of range'
+  ' error.
+  ' We're going to let such an error escape by embedding the
+  ' statement between the following two 'on error …' statements:
+  '
+    on error resume next
+    set mdl = vb_comps(moduleName)
+    on error goto 0
+
+    if not isEmpty(mdl) then
+'   if typeName(mdl) = "VBComponent" then
+       vb_comps.remove mdl
     end if
 
     set mdl = vb_comps.add(moduleType)
@@ -143,3 +158,11 @@ sub addReference(app, guid, major, minor) ' {
   '
     call app.VBE.activeVbProject.references.addFromGuid (guid, major, minor)
 end sub ' }
+
+function currentDir() ' {
+     dim wshShell
+     set wshShell = createObject("WScript.Shell")
+
+     currentDir = wshShell.CurrentDirectory & "\"
+
+end function ' }
