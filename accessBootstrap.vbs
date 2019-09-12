@@ -62,9 +62,9 @@ function createOfficeApp(officeName, fileName) ' {
 
     elseIf officeName = "excel"  then
 
-           dim xls
            set createOfficeApp = createObject("excel.application")
-           set xls = app.workBooks.add
+           dim xls
+           set xls = createOfficeApp.workBooks.add
            xls.saveAs fileName, 52 ' 52 = xlOpenXMLWorkbookMacroEnabled
 
     end if
