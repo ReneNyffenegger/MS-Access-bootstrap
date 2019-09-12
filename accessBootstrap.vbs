@@ -7,17 +7,8 @@
 
 option explicit
 
-' dim accessFile
-' dim app       ' as access.application
-' dim xls
-
 dim fso
 set fso = createObject("Scripting.FileSystemObject")
-  
-dim vb_editor ' as vbe
-
-dim vb_proj   ' as VBProject
-dim vb_comps  ' as VBComponents
 
 function createDB(accessFile) ' {
 
@@ -73,9 +64,12 @@ function createOfficeApp(officeName, fileName) ' {
     createOfficeApp.visible     = true
     createOfficeApp.userControl = true ' https://stackoverflow.com/q/36282024/180275
 
-    set vb_editor = createOfficeApp.vbe
-    set vb_proj   = vb_editor.activeVBProject
-    set vb_comps  = vb_proj.vbComponents
+' ' dim vb_editor ' as vbe
+' ' dim vb_proj   ' as VBProject
+' ' dim vb_comps  ' as VBComponents
+'     set vb_editor = createOfficeApp.vbe
+'     set vb_proj   = vb_editor.activeVBProject
+'     set vb_comps  = vb_proj.vbComponents
 
   '
   ' Add (type lib) reference to "Microsoft Visual Basic for Applications Extensibility 5.3"
@@ -98,8 +92,16 @@ sub insertModule(app, moduleFilePath, moduleName, moduleType) ' {
        wscript.quit
     end if ' }
 
-    dim mdl ' as VBComponent
-    set mdl = vb_comps.add(1) ' 1 = vbext_ct_StdModule
+
+    dim vb_editor ' as vbe
+    dim vb_proj   ' as VBProject
+    dim vb_comps  ' as VBComponents
+    dim mdl       ' as VBComponent
+
+    set vb_editor = app.vbe
+    set vb_proj   = vb_editor.activeVBProject
+    set vb_comps  = vb_proj.vbComponents
+    set mdl       = vb_comps.add(1) ' 1 = vbext_ct_StdModule
    
     wscript.echo("adding scriptFile " & ModuleFilePath)
     mdl.codeModule.addFromFile (ModuleFilePath)
