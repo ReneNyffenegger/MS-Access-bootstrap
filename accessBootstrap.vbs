@@ -101,7 +101,7 @@ sub insertModule(app, moduleFilePath, moduleName, moduleType) ' {
     set vb_editor = app.vbe
     set vb_proj   = vb_editor.activeVBProject
     set vb_comps  = vb_proj.vbComponents
-    set mdl       = vb_comps.add(1) ' 1 = vbext_ct_StdModule
+    set mdl       = vb_comps.add(moduleType)
    
     wscript.echo("adding scriptFile " & ModuleFilePath)
     mdl.codeModule.addFromFile (ModuleFilePath)
