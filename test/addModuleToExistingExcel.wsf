@@ -1,0 +1,43 @@
+<!--
+
+   cscript addModuleToExistingExcel.wsf
+
+-->
+
+<job id="IsThisIdRequired">
+   <script language="VBScript" src="../accessBootstrap.vbs" />
+
+   <script language="VBScript">
+
+      dim wshShell
+      set wshShell = createObject("WScript.Shell")
+
+      if wscript.arguments.count <> 1 then
+         wscript.echo("Specify version of file to be inserted (1 or 2)")
+         wscript.quit
+      end if
+
+      dim sourceVersion
+      sourceVersion = wscript.arguments(0)
+
+      if sourceVersion <> "1" and sourceVersion <> "2" then
+         wscript.echo("Specify version of file to be inserted (1 or 2)")
+         wscript.quit
+      end if
+
+      dim projectRootDir
+          projectRootDir = wshShell.CurrentDirectory & "\" ' "p:\ath\to\project\root\"
+
+      dim app
+      set app = createObject("excel.application")
+      app.visible = true
+
+      dim xls
+      set xls = app.workBooks.open(projectRootDir & "created.xlsm")
+
+      call insertModule(app, projectRootDir & "excel-func-v" & sourceVersion & ".bas", "func", 1)
+      app.run "main"
+      xls.save
+
+   </script>
+</job>

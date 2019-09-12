@@ -39,11 +39,18 @@ function createDB(accessFile) ' {
 end function ' }
 
 function createOfficeApp(officeName, fileName) ' {
+ '
+ '  Note: when creating an Access database, this function
+ '  returns an application object. When creating an excel
+ '  Worksheet, it retuns an Excel Worksheet.
+ '
 
     if fso.fileExists(fileName) then
        wscript.echo fileName & " already exists. Deleting it."
        fso.deleteFile(fileName)
     end if
+
+    dim app
   
   
     if     officeName = "access" then
@@ -51,30 +58,34 @@ function createOfficeApp(officeName, fileName) ' {
            set createOfficeApp = createObject("access.application")
            createOfficeApp.newCurrentDatabase fileName, 0 ' 0: acNewDatabaseFormatUserDefault
 
+           set app = createOfficeApp
+
     elseIf officeName = "excel"  then
 
-           set createOfficeApp = createObject("excel.application")
-           dim xls
-           set xls = createOfficeApp.workBooks.add
-           xls.saveAs fileName, 52 ' 52 = xlOpenXMLWorkbookMacroEnabled
+           set app             = createObject("excel.application")
+
+         '
+         ' createOfficeApp becomes a worksheet here, really...
+         '
+           set createOfficeApp = app.workBooks.add
+           wscript.echo("typeName(createOfficeApp) = " & typeName(createOfficeApp))
+           createOfficeApp.saveAs fileName, 52 ' 52 = xlOpenXMLWorkbookMacroEnabled
 
     end if
 
 
-    createOfficeApp.visible     = true
-    createOfficeApp.userControl = true ' https://stackoverflow.com/q/36282024/180275
+    app.visible     = true
 
-' ' dim vb_editor ' as vbe
-' ' dim vb_proj   ' as VBProject
-' ' dim vb_comps  ' as VBComponents
-'     set vb_editor = createOfficeApp.vbe
-'     set vb_proj   = vb_editor.activeVBProject
-'     set vb_comps  = vb_proj.vbComponents
+  '
+  ' Keep application opened after scripts terminates
+  '   https://stackoverflow.com/q/36282024/180275
+  '
+    app.userControl = true
 
   '
   ' Add (type lib) reference to "Microsoft Visual Basic for Applications Extensibility 5.3"
   '
-    call addReference(createOfficeApp, "{0002E157-0000-0000-C000-000000000046}", 5, 3)
+    call addReference(app, "{0002E157-0000-0000-C000-000000000046}", 5, 3)
 
 end function ' }
 
@@ -101,14 +112,22 @@ sub insertModule(app, moduleFilePath, moduleName, moduleType) ' {
     set vb_editor = app.vbe
     set vb_proj   = vb_editor.activeVBProject
     set vb_comps  = vb_proj.vbComponents
-    set mdl       = vb_comps.add(moduleType)
+
+  '
+  ' Check if a module by the given name already exists.
+  ' If so, remove it
+  '
+    if not vb_comps(moduleName) is nothing then
+       vb_comps.remove vb_comps(moduleName)
+    end if
+
+    set mdl = vb_comps.add(moduleType)
    
-    wscript.echo("adding scriptFile " & ModuleFilePath)
-    mdl.codeModule.addFromFile (ModuleFilePath)
+    mdl.codeModule.addFromFile(ModuleFilePath)
    
     mdl.name = moduleName
    
-    if app.name = "MicrosoftAccess" then
+    if app.name = "Microsoft Access" then
        app.doCmd.close 5, mdl.name, 1 ' 5=acModule, 1=acSaveYes
     end if
 

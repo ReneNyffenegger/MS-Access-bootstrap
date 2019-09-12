@@ -22,7 +22,9 @@
       wscript.echo("projectRootDir = " & projectRootDir)
 
       dim app
-      set app = createOfficeApp("excel", projectRootDir & "created.xlsm")
+      dim xls
+      set xls = createOfficeApp("excel", projectRootDir & "created.xlsm")
+      set app = xls.application
 
     '
     ' Add (TypeLib) References
@@ -37,6 +39,8 @@
 
     '
       call app.run("initCreationOfExcelApp", projectRootDir)
+
+      xls.save
 
       wscript.echo("The end")
 

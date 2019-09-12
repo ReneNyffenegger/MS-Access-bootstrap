@@ -61,6 +61,7 @@
       '   (Error message: Microsoft VBScript compilation error: Cannot use parentheses when calling a Sub )
       '
         app.run "createApplication", projectRootDir
+'       app.save
   
         wscript.echo("The end")
 
