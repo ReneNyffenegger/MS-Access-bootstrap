@@ -8,8 +8,8 @@
 option explicit
 
 ' dim accessFile
-dim app       ' as access.application
-dim xls
+' dim app       ' as access.application
+' dim xls
 
 dim fso
 set fso = createObject("Scripting.FileSystemObject")
@@ -19,9 +19,10 @@ dim vb_editor ' as vbe
 dim vb_proj   ' as VBProject
 dim vb_comps  ' as VBComponents
 
-sub createDB(accessFile) ' {
+function createDB(accessFile) ' {
 
-    createOfficeApp "access", accessFile
+'   dim app
+    set createDB = createOfficeApp("access", accessFile)
 
 '   if fso.fileExists(accessFile) then
 '      wscript.echo accessFile & " already exists. Deleting it."
@@ -44,9 +45,9 @@ sub createDB(accessFile) ' {
 ' '
 '   call addReference("{0002E157-0000-0000-C000-000000000046}", 5, 3)
 
-end sub ' }
+end function ' }
 
-sub createOfficeApp(officeName, fileName) ' {
+function createOfficeApp(officeName, fileName) ' {
 
     if fso.fileExists(fileName) then
        wscript.echo fileName & " already exists. Deleting it."
@@ -56,34 +57,34 @@ sub createOfficeApp(officeName, fileName) ' {
   
     if     officeName = "access" then
 
-           set app = createObject("access.application")
-           app.newCurrentDatabase fileName, 0 ' 0: acNewDatabaseFormatUserDefault
+           set createOfficeApp = createObject("access.application")
+           createOfficeApp.newCurrentDatabase fileName, 0 ' 0: acNewDatabaseFormatUserDefault
 
     elseIf officeName = "excel"  then
 
-           set app = createObject("excel.application")
+           dim xls
+           set createOfficeApp = createObject("excel.application")
            set xls = app.workBooks.add
            xls.saveAs fileName, 52 ' 52 = xlOpenXMLWorkbookMacroEnabled
 
     end if
 
 
-    app.visible     = true
-    app.userControl = true ' https://stackoverflow.com/q/36282024/180275
+    createOfficeApp.visible     = true
+    createOfficeApp.userControl = true ' https://stackoverflow.com/q/36282024/180275
 
-    set vb_editor = app.vbe
+    set vb_editor = createOfficeApp.vbe
     set vb_proj   = vb_editor.activeVBProject
     set vb_comps  = vb_proj.vbComponents
 
   '
   ' Add (type lib) reference to "Microsoft Visual Basic for Applications Extensibility 5.3"
   '
-    call addReference("{0002E157-0000-0000-C000-000000000046}", 5, 3)
+    call addReference(createOfficeApp, "{0002E157-0000-0000-C000-000000000046}", 5, 3)
 
-end sub ' }
+end function ' }
 
-
-sub insertModule(moduleFilePath, moduleName, moduleType) ' {
+sub insertModule(app, moduleFilePath, moduleName, moduleType) ' {
  '
  '  moduleType:
  '    1 = vbext_ct_StdModule
@@ -112,7 +113,7 @@ sub insertModule(moduleFilePath, moduleName, moduleType) ' {
 
 end sub ' }
 
-sub addReference(guid, major, minor) ' {
+sub addReference(app, guid, major, minor) ' {
   '
   ' guid identfies a type lib. Thus, the guid should be found in the
   ' Registry under HKEY_CLASSES_ROOT\TypeLib\
