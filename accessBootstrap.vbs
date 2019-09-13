@@ -68,19 +68,30 @@ function createOfficeApp(officeName, fileName) ' {
          ' createOfficeApp becomes a worksheet here, really...
          '
            set createOfficeApp = app.workBooks.add
-           wscript.echo("typeName(createOfficeApp) = " & typeName(createOfficeApp))
            createOfficeApp.saveAs fileName, 52 ' 52 = xlOpenXMLWorkbookMacroEnabled
+
+    elseIf officeName = "word"   then
+
+           set app             = createObject("word.application")
+
+           set createOfficeApp = app.documents.add
+           createOfficeApp.saveAs fileName, 20 ' 20 = wdFormatFlatXMLMacroEnabled (Open XML file format with macros enabled saved as a single XML file.)
 
     end if
 
-
     app.visible     = true
 
+    if officeName <> "word" then
   '
   ' Keep application opened after scripts terminates
   '   https://stackoverflow.com/q/36282024/180275
   '
-    app.userControl = true
+  ' In Word, userControl is read only and set to true if
+  ' the application was created with createObject(), getObject() or opened
+  ' with open()
+  '
+      app.userControl = true
+    end if
 
   '
   ' Add (type lib) reference to "Microsoft Visual Basic for Applications Extensibility 5.3"

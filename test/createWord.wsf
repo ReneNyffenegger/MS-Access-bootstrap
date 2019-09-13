@@ -1,0 +1,37 @@
+<!--
+
+   Create an Word application from commandline with VBScript:
+
+       cscript createWord.wsf
+
+-->
+<job id="IsThisIdRequired">
+
+   <script language="VBScript" src="../accessBootstrap.vbs" />
+
+   <script language="VBScript">
+
+      option explicit
+
+      dim projectRootDir
+          projectRootDir = currentDir()
+
+
+      dim app
+      dim doc
+      set doc = createOfficeApp("word", projectRootDir & "created.xlsm")
+      set app = doc.application
+
+    '
+    ' Insert a module. The 3rd parameter (1) indicates a »normal« module (vbext_ct_StdModule)
+    ' rather than a class module (vbext_ct_ClassModule)
+    '
+      call insertModule(app, projectRootDir & "init-word.bas", "init", 1)
+
+      call app.run("initCreationOfWordApp", projectRootDir)
+
+      doc.save
+
+   </script>
+
+</job>
