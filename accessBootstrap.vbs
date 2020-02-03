@@ -100,6 +100,22 @@ function createOfficeApp(officeName, fileName) ' {
 
 end function ' }
 
+sub replaceThisWorksheetModule(app, moduleFilePath) ' {
+ '
+ '  Set the content of an Excel's ThisWorksheet module
+ '
+
+    if not fso.fileExists(moduleFilePath) then ' {
+       wscript.echo moduleFilePath & " does not exist!"
+       wscript.quit
+    end if ' }
+
+    dim mdl
+    set mdl = app.vbe.activeVBProject.vbComponents.item(1).codeModule
+    call mdl.addFromFile (moduleFilePath)
+
+end sub ' }
+
 sub insertModule(app, moduleFilePath, moduleName, moduleType) ' {
  '
  '  moduleType:

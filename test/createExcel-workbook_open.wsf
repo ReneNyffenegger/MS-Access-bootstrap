@@ -1,0 +1,46 @@
+<!--
+
+   Create an Excel application from commandline with VBScript:
+
+       cscript createExcel-workbook_open.wsf
+
+-->
+<job id="IsThisIdRequired">
+
+   <script language="VBScript" src="../accessBootstrap.vbs" />
+
+   <script language="VBScript">
+
+      option explicit
+
+      dim wshShell
+      set wshShell = createObject("WScript.Shell")
+
+      dim projectRootDir
+          projectRootDir = wshShell.CurrentDirectory & "\" ' "p:\ath\to\project\root\"
+
+      wscript.echo("projectRootDir = " & projectRootDir)
+
+      dim app
+      dim xls
+      set xls = createOfficeApp("excel", projectRootDir & "workbook_open.xlsm")
+      set app = xls.application
+
+    '
+    ' Add (TypeLib) References
+    '          '          '
+'     call addReference("{420B2830-E718-11CF-893D-00A0C9054228}", 1, 0) ' Microsoft Scripting Runtime
+
+    '
+    ' Insert a module. The 3rd parameter (1) indicates a »normal« module (vbext_ct_StdModule)
+    ' rather than a class module (vbext_ct_ClassModule)
+    '
+      call replaceThisWorksheetModule(app, projectRootDir & "thisWorkbook.bas")
+
+      xls.save
+
+      wscript.echo("The end")
+
+   </script>
+
+</job>
